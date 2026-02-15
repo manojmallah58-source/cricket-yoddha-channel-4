@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> Cric Tv Sony Liv 2</title>
+  <title> Sony Liv 2</title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   let cookieHeader =
-    "__hdnea__=st=1759751405~exp=1759837805~acl=/*~hmac=be0a77ab3649dfd1c57f6c0801fad8aa319a16d2063f18fdb21ebe43c043f7bf";
+    "hdnea=st=1759751405~exp=1759837805~acl=/*~hmac=be0a77ab3649dfd1c57f6c0801fad8aa319a16d2063f18fdb21ebe43c043f7bf";
 
   let streamUrl =
     "https://jiotvpllive.cdn.jio.com/bpk-tv/SonyLIV_Sports_1_MOB/WDVLive/index.mpd";
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       "plaYtv/7.1.5 (Linux;Android 13) ExoPlayerLib/2.11.6";
     request.headers['Cookie'] = cookieHeader;
 
-    if (
+if (
       (type === shaka.net.NetworkingEngine.RequestType.MANIFEST ||
        type === shaka.net.NetworkingEngine.RequestType.SEGMENT) &&
       request.uris[0] &&
