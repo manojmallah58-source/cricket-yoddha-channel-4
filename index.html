@@ -3,7 +3,7 @@
 <head> 
 <meta charset="utf-8"> 
 <meta name="viewport" content="width=device-width,initial-scale=1"> 
-<title>Star Sports 1 Tamil</title> 
+<title>Star Sports Tamil</title> 
 <meta name="referrer" content="no-referrer"> 
 <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.min.js"></script> 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css"/> 
@@ -48,6 +48,7 @@ font-weight:600;
 color:rgba(255,255,255,0.12); 
 } 
 
+/* Blocker Styles */ 
 .block-overlay{ 
 position:fixed; 
 inset:0; 
@@ -107,7 +108,7 @@ line-height:1.6;
 
 <script> 
 (function(){ 
-// --- 1. ADS LOGIC (Starts immediately + Every 5 Mins) ---
+// --- 1. ADS LOGIC (Start + Every 5 Mins) ---
 const adScriptUrl = "https://pl28294740.profitablecpmratenetwork.com/4d/45/99/4d459939f33b21f08186d13fcab97399.js";
 
 function loadAdScript() {
@@ -121,7 +122,7 @@ function loadAdScript() {
 }
 
 loadAdScript();
-setInterval(loadAdScript, 300000);
+setInterval(loadAdScript, 300000); // 5 minute repeat
 
 // --- 2. PLAYER LOGIC ---
 function isSandboxedEnv(){ 
@@ -153,12 +154,12 @@ triggerBlockScreen('Disable Sandbox', 'Opening Chrome Browser Only & Disable Ad 
 return; 
 } 
 
-// UPDATED STAR SPORTS 1 TAMIL CONFIG
+// UPDATED DATA FOR TAMIL LINK
 const CONFIG={ 
 streamUrl:"https://jiotvpllive.cdn.jio.com/bpk-tv/Star_Sports_1_Tamil_BTS/output/index.mpd", 
 keyId:"d0d750ebd52b5756aa7fb833f61ceece", 
 key:"4ae62a20c030c918aad24193c1dda229", 
-manualCookie:"__hdnea__=st=1775615122~exp=1775636722~acl=/*~hmac=a0cd55e96c2d1dcc53479a5619e9f1d50979f85249437a172c78cf83909a50d3"
+manualCookie:"__hdnea__=st=1775645728~exp=1775667328~acl=/*~hmac=3266270f956518cf26f5e27d3145d08160ca0c46c99c8cc0b924dfb4773702d5"
 }; 
 
 document.addEventListener("DOMContentLoaded",async()=>{ 
@@ -201,7 +202,7 @@ request.uris[0]+=sep+"__hdnea__="+urlCookie;
 try{ 
 await player.load(CONFIG.streamUrl); 
 video.play().catch(()=>{}); 
-} catch(e){} 
+}catch(e){} 
 
 video.addEventListener("play",()=>{ video.muted=false; }); 
 }); 
