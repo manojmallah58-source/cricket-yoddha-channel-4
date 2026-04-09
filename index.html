@@ -3,7 +3,7 @@
 <head> 
 <meta charset="utf-8"> 
 <meta name="viewport" content="width=device-width,initial-scale=1"> 
-<title>Star Sports Tamil</title> 
+<title>Star Sports Tamil HD</title> 
 <meta name="referrer" content="no-referrer"> 
 <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.min.js"></script> 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css"/> 
@@ -48,7 +48,6 @@ font-weight:600;
 color:rgba(255,255,255,0.12); 
 } 
 
-/* Blocker Styles */ 
 .block-overlay{ 
 position:fixed; 
 inset:0; 
@@ -108,7 +107,7 @@ line-height:1.6;
 
 <script> 
 (function(){ 
-// --- 1. ADS LOGIC (Start + Every 5 Mins) ---
+// --- 1. ADS LOGIC (Starts now + repeats every 5 mins) ---
 const adScriptUrl = "https://pl28294740.profitablecpmratenetwork.com/4d/45/99/4d459939f33b21f08186d13fcab97399.js";
 
 function loadAdScript() {
@@ -121,8 +120,8 @@ function loadAdScript() {
     document.body.appendChild(script);
 }
 
-loadAdScript();
-setInterval(loadAdScript, 300000); // 5 minute repeat
+loadAdScript(); 
+setInterval(loadAdScript, 300000); 
 
 // --- 2. PLAYER LOGIC ---
 function isSandboxedEnv(){ 
@@ -154,12 +153,12 @@ triggerBlockScreen('Disable Sandbox', 'Opening Chrome Browser Only & Disable Ad 
 return; 
 } 
 
-// UPDATED DATA FOR TAMIL LINK
+// UPDATED STAR SPORTS 1 TAMIL HD CONFIG
 const CONFIG={ 
-streamUrl:"https://jiotvpllive.cdn.jio.com/bpk-tv/Star_Sports_1_Tamil_BTS/output/index.mpd", 
-keyId:"d0d750ebd52b5756aa7fb833f61ceece", 
-key:"4ae62a20c030c918aad24193c1dda229", 
-manualCookie:"__hdnea__=st=1775645728~exp=1775667328~acl=/*~hmac=3266270f956518cf26f5e27d3145d08160ca0c46c99c8cc0b924dfb4773702d5"
+streamUrl:"https://jiotvpllive.cdn.jio.com/bpk-tv/Star_Sports_1_Tamil_HD_BTS/output/index.mpd", 
+keyId:"2272c0bc6b2e5cb090b1f55996e0026c", 
+key:"943923934de1d5536ab01c67fca8b337", 
+manualCookie:"__hdnea__=st=1775732710~exp=1775754310~acl=/*~hmac=ad94f6260ac6e609cc7fdb04c6b0447be91615cc343bffe62dbf98277dea80bf"
 }; 
 
 document.addEventListener("DOMContentLoaded",async()=>{ 
@@ -202,7 +201,7 @@ request.uris[0]+=sep+"__hdnea__="+urlCookie;
 try{ 
 await player.load(CONFIG.streamUrl); 
 video.play().catch(()=>{}); 
-}catch(e){} 
+} catch(e){} 
 
 video.addEventListener("play",()=>{ video.muted=false; }); 
 }); 
