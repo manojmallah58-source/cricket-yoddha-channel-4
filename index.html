@@ -3,18 +3,10 @@
 <head> 
 <meta charset="utf-8"> 
 <meta name="viewport" content="width=device-width,initial-scale=1"> 
-<title>Star Sports Tamil HD</title> 
+<title>Live Stream Player</title> 
 <meta name="referrer" content="no-referrer"> 
 <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.min.js"></script> 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css"/> 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-FMP9REY96D"></script> 
-<script> 
-window.dataLayer = window.dataLayer || []; 
-function gtag(){dataLayer.push(arguments);} 
-gtag('js', new Date()); 
-gtag('config', 'G-FMP9REY96D'); 
-</script> 
 
 <style> 
 *{margin:0;padding:0;box-sizing:border-box} 
@@ -107,23 +99,7 @@ line-height:1.6;
 
 <script> 
 (function(){ 
-// --- 1. ADS LOGIC (Starts now + repeats every 5 mins) ---
-const adScriptUrl = "https://pl28294740.profitablecpmratenetwork.com/4d/45/99/4d459939f33b21f08186d13fcab97399.js";
-
-function loadAdScript() {
-    const oldScript = document.querySelector(`script[src="${adScriptUrl}"]`);
-    if (oldScript) oldScript.remove();
-
-    const script = document.createElement('script');
-    script.src = adScriptUrl;
-    script.async = true;
-    document.body.appendChild(script);
-}
-
-loadAdScript(); 
-setInterval(loadAdScript, 300000); 
-
-// --- 2. PLAYER LOGIC ---
+// --- PLAYER LOGIC ---
 function isSandboxedEnv(){ 
 try { 
 if (window.self === window.top) return false; 
@@ -149,16 +125,15 @@ container.style.display = 'none';
 } 
 
 if(isSandboxedEnv()){ 
-triggerBlockScreen('Disable Sandbox', 'Opening Chrome Browser Only & Disable Ad blocker'); 
+triggerBlockScreen('Disable Sandbox', 'Please open in a standard browser like Chrome to play the stream.'); 
 return; 
 } 
 
-// UPDATED STAR SPORTS 1 TAMIL HD CONFIG
+// UPDATED CONFIG WITH NEW URL AND CLEARKEY
 const CONFIG={ 
-streamUrl:"https://jiotvpllive.cdn.jio.com/bpk-tv/Star_Sports_1_Tamil_HD_BTS/output/index.mpd", 
-keyId:"2272c0bc6b2e5cb090b1f55996e0026c", 
-key:"943923934de1d5536ab01c67fca8b337", 
-manualCookie:"__hdnea__=st=1775732710~exp=1775754310~acl=/*~hmac=ad94f6260ac6e609cc7fdb04c6b0447be91615cc343bffe62dbf98277dea80bf"
+streamUrl:"https://otte.cache.aiv-cdn.net/iad-nitro/live/clients/dash/enc/g1dfcfuab2/out/v1/3e19da83817d4e24911c982e1416ab50/cenc.mpd", 
+keyId:"010fb417309c2465556825c02413a153", 
+key:"1f95533191c36d9c2ee0d2e4d4c476e9"
 }; 
 
 document.addEventListener("DOMContentLoaded",async()=>{ 
@@ -185,23 +160,17 @@ streaming:{ lowLatencyMode:true, bufferingGoal:10, rebufferingGoal:2, safeSeekOf
 }); 
 
 player.getNetworkingEngine().registerRequestFilter((type,request)=>{ 
-request.headers["Referer"]="https://www.jiotv.com/"; 
-request.headers["User-Agent"]="plaYtv/7.1.5 (Linux;Android 13) ExoPlayerLib/2.11.6"; 
-request.headers["Cookie"]=CONFIG.manualCookie; 
-
-let urlCookie = CONFIG.manualCookie.substring(10); 
-if((type===shaka.net.NetworkingEngine.RequestType.MANIFEST|| 
-type===shaka.net.NetworkingEngine.RequestType.SEGMENT)&& 
-!request.uris[0].includes("__hdnea__")){ 
-const sep=request.uris[0].includes("?")?"&":"?"; 
-request.uris[0]+=sep+"__hdnea__="+urlCookie; 
-} 
+// Referer and UA settings for AIV/Nitro CDN compatibility
+request.headers["Referer"]="https://www.primevideo.com/"; 
+request.headers["User-Agent"]="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"; 
 }); 
 
 try{ 
 await player.load(CONFIG.streamUrl); 
 video.play().catch(()=>{}); 
-} catch(e){} 
+}catch(e){
+    console.error("Error loading stream:", e);
+} 
 
 video.addEventListener("play",()=>{ video.muted=false; }); 
 }); 
