@@ -3,7 +3,7 @@
 <head> 
 <meta charset="utf-8"> 
 <meta name="viewport" content="width=device-width,initial-scale=1"> 
-<title>Live Stream Player</title> 
+<title>CricLife1 Live</title> 
 <meta name="referrer" content="no-referrer"> 
 <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.min.js"></script> 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css"/> 
@@ -26,18 +26,6 @@ width:100%;
 height:100%; 
 object-fit:contain; 
 background:#000; 
-} 
-
-.custom-watermark{ 
-position:absolute; 
-z-index:40; 
-pointer-events:none; 
-top:65%; 
-left:6%; 
-transform:translateY(-50%); 
-font-size:11px; 
-font-weight:600; 
-color:rgba(255,255,255,0.12); 
 } 
 
 .block-overlay{ 
@@ -84,7 +72,6 @@ line-height:1.6;
 } 
 
 @media(max-width:700px){ 
-.custom-watermark{font-size:9px;top:60%;left:16%} 
 .block-title{font-size:28px} 
 .block-box{padding:25px} 
 } 
@@ -94,12 +81,11 @@ line-height:1.6;
 
 <div class="shaka-video-container" id="player-container"> 
 <video id="video" autoplay muted playsinline preload="metadata"></video> 
-<div class="custom-watermark"> </div> 
 </div> 
 
 <script> 
 (function(){ 
-// --- PLAYER LOGIC ---
+// --- 1. PLAYER LOGIC ---
 function isSandboxedEnv(){ 
 try { 
 if (window.self === window.top) return false; 
@@ -125,15 +111,15 @@ container.style.display = 'none';
 } 
 
 if(isSandboxedEnv()){ 
-triggerBlockScreen('Disable Sandbox', 'Please open in a standard browser like Chrome to play the stream.'); 
+triggerBlockScreen('Security Alert', 'Please open this link directly in a browser.'); 
 return; 
 } 
 
-// UPDATED CONFIG WITH NEW URL AND CLEARKEY
+// UPDATED CRICLIFE1 CONFIG
 const CONFIG={ 
-streamUrl:"https://otte.cache.aiv-cdn.net/iad-nitro/live/clients/dash/enc/g1dfcfuab2/out/v1/3e19da83817d4e24911c982e1416ab50/cenc.mpd", 
-keyId:"010fb417309c2465556825c02413a153", 
-key:"1f95533191c36d9c2ee0d2e4d4c476e9"
+streamUrl:"https://ev-fast-mpd.starzplayarabia.com/live/eds/CricLife1/DASH/CricLife1.mpd", 
+keyId:"1e23e51b09a67b83813c17049870bcd4", 
+key:"c3d6288e378b0dc55320fd0e6fd2e55f"
 }; 
 
 document.addEventListener("DOMContentLoaded",async()=>{ 
@@ -157,12 +143,6 @@ player.configure({
 drm:{clearKeys:{[CONFIG.keyId]:CONFIG.key}}, 
 manifest:{defaultPresentationDelay:5}, 
 streaming:{ lowLatencyMode:true, bufferingGoal:10, rebufferingGoal:2, safeSeekOffset:5 } 
-}); 
-
-player.getNetworkingEngine().registerRequestFilter((type,request)=>{ 
-// Referer and UA settings for AIV/Nitro CDN compatibility
-request.headers["Referer"]="https://www.primevideo.com/"; 
-request.headers["User-Agent"]="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"; 
 }); 
 
 try{ 
