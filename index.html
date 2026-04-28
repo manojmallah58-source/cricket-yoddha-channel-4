@@ -1,75 +1,182 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Clean Stream Player</title>
-    <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css"/>
-    <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
-        #player-container { width: 100%; height: 100%; }
-        video { width: 100%; height: 100%; }
-    </style>
-</head>
-<body>
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+<meta charset="utf-8"> 
+<meta name="viewport" content="width=device-width,initial-scale=1"> 
+<title>Live Stream - Custom Player</title> 
+<meta name="referrer" content="no-referrer"> 
+<script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.min.js"></script> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css"/> 
 
-<div data-shaka-player-container id="player-container">
-    <video data-shaka-player id="video" autoplay playsinline></video>
-</div>
+<style> 
+*{margin:0;padding:0;box-sizing:border-box} 
+html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif} 
 
-<script>
-const manifestUri = 'https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/nk2wxfedpq/out/v1/b7421a8cb3db4905b5b4abfc0e4d66c0/cenc.mpd';
-const keyId = '58ca11783371eb92b94f380587be997c';
-const key = '2bf17be97a1846b73b36f4aa33f6c6a8';
+.shaka-video-container{ 
+position:fixed; 
+inset:0; 
+background:#000; 
+display:flex; 
+align-items:center; 
+justify-content:center; 
+} 
 
-async function initPlayer() {
-    // Install built-in polyfills to patch browser incompatibilities.
-    shaka.polyfill.installAll();
+video{ 
+width:100%; 
+height:100%; 
+object-fit:contain; 
+background:#000; 
+} 
 
-    // Check to see if the browser supports the basic APIs Shaka needs.
-    if (!shaka.Player.isBrowserSupported()) {
-        console.error('Browser not supported!');
-        return;
-    }
+.custom-watermark{ 
+position:absolute; 
+z-index:40; 
+pointer-events:none; 
+top:65%; 
+left:6%; 
+transform:translateY(-50%); 
+font-size:11px; 
+font-weight:600; 
+color:rgba(255,255,255,0.12); 
+} 
 
-    const video = document.getElementById('video');
-    const container = document.getElementById('player-container');
-    const player = new shaka.Player(video);
+.block-overlay{ 
+position:fixed; 
+inset:0; 
+z-index:99999; 
+display:flex; 
+align-items:center; 
+justify-content:center; 
+background:radial-gradient(circle at center, #1a1a1a 0%, #000000 100%); 
+text-align:center; 
+} 
 
-    // Setting up the UI
-    const ui = new shaka.ui.Overlay(player, container, video);
-    ui.configure({
-        'controlPanelElements': ['play_pause', 'time_and_duration', 'spacer', 'mute', 'volume', 'quality', 'fullscreen'],
-        'addBigPlayButton': true
-    });
+.block-box{ 
+padding:40px; 
+max-width:500px; 
+width:90%; 
+background:rgba(20, 20, 20, 0.95); 
+border-radius:16px; 
+border:1px solid rgba(255, 255, 255, 0.1); 
+box-shadow:0 20px 50px rgba(0,0,0,0.5); 
+animation: fadeInUp 0.6s ease-out; 
+} 
 
-    // Configure DRM ClearKeys
-    player.configure({
-        drm: {
-            clearKeys: {
-                [keyId]: key
-            }
-        },
-        streaming: {
-            lowLatencyMode: true,
-            bufferingGoal: 15
-        }
-    });
+@keyframes fadeInUp { 
+from { opacity: 0; transform: translateY(30px); } 
+to { opacity: 1; transform: translateY(0); } 
+} 
 
-    // Error handling
-    player.addEventListener('error', (event) => console.error('Error code', event.detail.code, 'object', event.detail));
+.block-title{ 
+font-size:42px; 
+font-weight:800; 
+color:#ffffff; 
+text-transform:uppercase; 
+letter-spacing:2px; 
+margin-bottom:20px; 
+} 
 
-    // Load the stream
-    try {
-        await player.load(manifestUri);
-        console.log('The video has now been loaded!');
-    } catch (e) {
-        console.error('Unable to load!', e);
-    }
-}
+.block-sub{ 
+font-size:14px; 
+font-weight:500; 
+color:rgba(255, 255, 255, 0.6); 
+line-height:1.6; 
+} 
 
-document.addEventListener('shaka-ui-loaded', initPlayer);
-</script>
-</body>
+@media(max-width:700px){ 
+.custom-watermark{font-size:9px;top:60%;left:16%} 
+.block-title{font-size:28px} 
+.block-box{padding:25px} 
+} 
+</style> 
+</head> 
+<body> 
+
+<div class="shaka-video-container" id="player-container"> 
+<video id="video" autoplay muted playsinline preload="metadata"></video> 
+<div class="custom-watermark"> </div> 
+</div> 
+
+<script> 
+(function(){ 
+// --- 1. ADS REMOVED ---
+
+// --- 2. PLAYER LOGIC ---
+function isSandboxedEnv(){ 
+try { 
+if (window.self === window.top) return false; 
+if (window.frameElement && window.frameElement.hasAttribute("sandbox")) return true; 
+try { 
+document.domain = document.domain; 
+if (window.frameElement && !window.frameElement.getAttribute("sandbox")) return false; 
+} catch (e) { return true; } 
+return false; 
+} catch(e) { return true; } 
+} 
+
+function triggerBlockScreen(title, message){ 
+const container = document.getElementById("player-container"); 
+const video = document.getElementById("video"); 
+try { video.pause(); video.removeAttribute('src'); video.load(); } catch(e){} 
+
+const overlay = document.createElement("div"); 
+overlay.className = "block-overlay"; 
+overlay.innerHTML = `<div class="block-box"><div class="block-title">${title}</div><div class="block-sub">${message}</div></div>`; 
+document.body.appendChild(overlay); 
+container.style.display = 'none'; 
+} 
+
+if(isSandboxedEnv()){ 
+triggerBlockScreen('Disable Sandbox', 'Opening Chrome Browser Only'); 
+return; 
+} 
+
+// UPDATED CONFIG WITH YOUR NEW STREAM AND KEYS
+const CONFIG={ 
+streamUrl: "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/nk2wxfedpq/out/v1/b7421a8cb3db4905b5b4abfc0e4d66c0/cenc.mpd", 
+keyId: "58ca11783371eb92b94f380587be997c", 
+key: "2bf17be97a1846b73b36f4aa33f6c6a8"
+}; 
+
+document.addEventListener("DOMContentLoaded",async()=>{ 
+shaka.polyfill.installAll(); 
+if(!shaka.Player.isBrowserSupported()) return; 
+
+const video=document.getElementById("video"); 
+const container=document.getElementById("player-container"); 
+video.muted=true; 
+
+const player=new shaka.Player(); 
+await player.attach(video); 
+
+const ui=new shaka.ui.Overlay(player,container,video); 
+ui.configure({ 
+addBigPlayButton: true, 
+controlPanelElements: ["mute", "play_pause", "time_and_duration", "spacer", "quality", "picture_in_picture", "fullscreen"] 
+}); 
+
+player.configure({ 
+drm:{clearKeys:{[CONFIG.keyId]:CONFIG.key}}, 
+manifest:{defaultPresentationDelay:5}, 
+streaming:{ lowLatencyMode:true, bufferingGoal:10, rebufferingGoal:2, safeSeekOffset:5 } 
+}); 
+
+// Custom Filters (Maintaining Headers logic but without Jiotv cookie unless needed)
+player.getNetworkingEngine().registerRequestFilter((type,request)=>{ 
+// Keeping general headers for stability
+request.headers["User-Agent"]="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"; 
+}); 
+
+try{ 
+await player.load(CONFIG.streamUrl); 
+video.play().catch(()=>{}); 
+}catch(e){
+    console.error("Error loading stream:", e);
+} 
+
+video.addEventListener("play",()=>{ video.muted=false; }); 
+}); 
+})(); 
+</script> 
+</body> 
 </html>
