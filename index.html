@@ -3,7 +3,7 @@
 <head> 
 <meta charset="utf-8"> 
 <meta name="viewport" content="width=device-width,initial-scale=1"> 
-<title>CricLife1 Live</title> 
+<title>CricLife 1 Live</title> 
 <meta name="referrer" content="no-referrer"> 
 <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.min.js"></script> 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css"/> 
@@ -56,7 +56,7 @@ to { opacity: 1; transform: translateY(0); }
 } 
 
 .block-title{ 
-font-size:42px; 
+font-size:32px; 
 font-weight:800; 
 color:#ffffff; 
 text-transform:uppercase; 
@@ -72,7 +72,7 @@ line-height:1.6;
 } 
 
 @media(max-width:700px){ 
-.block-title{font-size:28px} 
+.block-title{font-size:24px} 
 .block-box{padding:25px} 
 } 
 </style> 
@@ -90,10 +90,6 @@ function isSandboxedEnv(){
 try { 
 if (window.self === window.top) return false; 
 if (window.frameElement && window.frameElement.hasAttribute("sandbox")) return true; 
-try { 
-document.domain = document.domain; 
-if (window.frameElement && !window.frameElement.getAttribute("sandbox")) return false; 
-} catch (e) { return true; } 
 return false; 
 } catch(e) { return true; } 
 } 
@@ -111,11 +107,11 @@ container.style.display = 'none';
 } 
 
 if(isSandboxedEnv()){ 
-triggerBlockScreen('Security Alert', 'Please open this link directly in a browser.'); 
+triggerBlockScreen('Disable Sandbox', 'Please open this link directly in a browser (Chrome/Edge) for the best experience.'); 
 return; 
 } 
 
-// UPDATED CRICLIFE1 CONFIG
+// UPDATED CONFIG WITH YOUR NEW STREAM
 const CONFIG={ 
 streamUrl:"https://ev-fast-mpd.starzplayarabia.com/live/eds/CricLife1/DASH/CricLife1.mpd", 
 keyId:"1e23e51b09a67b83813c17049870bcd4", 
@@ -128,7 +124,6 @@ if(!shaka.Player.isBrowserSupported()) return;
 
 const video=document.getElementById("video"); 
 const container=document.getElementById("player-container"); 
-video.muted=true; 
 
 const player=new shaka.Player(); 
 await player.attach(video); 
@@ -140,16 +135,26 @@ controlPanelElements: ["mute", "play_pause", "time_and_duration", "spacer", "qua
 }); 
 
 player.configure({ 
-drm:{clearKeys:{[CONFIG.keyId]:CONFIG.key}}, 
+drm:{ 
+    clearKeys:{ 
+        [CONFIG.keyId]: CONFIG.key 
+    } 
+}, 
 manifest:{defaultPresentationDelay:5}, 
-streaming:{ lowLatencyMode:true, bufferingGoal:10, rebufferingGoal:2, safeSeekOffset:5 } 
+streaming:{ lowLatencyMode:true, bufferingGoal:15, rebufferingGoal:2, safeSeekOffset:5 } 
+}); 
+
+// Network filters removed headers that were specific to Jio, making it cleaner for StarzPlay
+player.getNetworkingEngine().registerRequestFilter((type,request)=>{ 
+    // Basic headers for compatibility
+    request.headers["Origin"] = "https://starzplay.com"; 
 }); 
 
 try{ 
 await player.load(CONFIG.streamUrl); 
 video.play().catch(()=>{}); 
 }catch(e){
-    console.error("Error loading stream:", e);
+    console.error("Error loading stream", e);
 } 
 
 video.addEventListener("play",()=>{ video.muted=false; }); 
