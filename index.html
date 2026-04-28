@@ -1,165 +1,93 @@
-<!DOCTYPE html> 
-<html lang="en"> 
-<head> 
-<meta charset="utf-8"> 
-<meta name="viewport" content="width=device-width,initial-scale=1"> 
-<title>CricLife 1 Live</title> 
-<meta name="referrer" content="no-referrer"> 
-<script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.min.js"></script> 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css"/> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Clean Dash Player</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+        #video-container {
+            width: 100%;
+            height: 100%;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
 
-<style> 
-*{margin:0;padding:0;box-sizing:border-box} 
-html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif} 
+    <div id="video-container" data-shaka-player-container>
+        <video id="video" data-shaka-player autoplay playsinline></video>
+    </div>
 
-.shaka-video-container{ 
-position:fixed; 
-inset:0; 
-background:#000; 
-display:flex; 
-align-items:center; 
-justify-content:center; 
-} 
+    <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.min.js"></script>
 
-video{ 
-width:100%; 
-height:100%; 
-object-fit:contain; 
-background:#000; 
-} 
+    <script>
+        // Configuration Constants
+        const MANIFEST_URL = "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/nk2wxfedpq/out/v1/b7421a8cb3db4905b5b4abfc0e4d66c0/cenc.mpd";
+        const KEY_ID = "58ca11783371eb92b94f380587be997c";
+        const CLEAR_KEY = "2bf17be97a1846b73b36f4aa33f6c6a8";
 
-.block-overlay{ 
-position:fixed; 
-inset:0; 
-z-index:99999; 
-display:flex; 
-align-items:center; 
-justify-content:center; 
-background:radial-gradient(circle at center, #1a1a1a 0%, #000000 100%); 
-text-align:center; 
-} 
+        async function initPlayer() {
+            // Install built-in polyfills to patch browser incompatibilities
+            shaka.polyfill.installAll();
 
-.block-box{ 
-padding:40px; 
-max-width:500px; 
-width:90%; 
-background:rgba(20, 20, 20, 0.95); 
-border-radius:16px; 
-border:1px solid rgba(255, 255, 255, 0.1); 
-box-shadow:0 20px 50px rgba(0,0,0,0.5); 
-animation: fadeInUp 0.6s ease-out; 
-} 
+            // Check to see if the browser supports the basic APIs
+            if (!shaka.Player.isBrowserSupported()) {
+                console.error('Browser not supported!');
+                return;
+            }
 
-@keyframes fadeInUp { 
-from { opacity: 0; transform: translateY(30px); } 
-to { opacity: 1; transform: translateY(0); } 
-} 
+            const video = document.getElementById('video');
+            const container = document.getElementById('video-container');
+            const player = new shaka.Player(video);
 
-.block-title{ 
-font-size:32px; 
-font-weight:800; 
-color:#ffffff; 
-text-transform:uppercase; 
-letter-spacing:2px; 
-margin-bottom:20px; 
-} 
+            // Setting up the UI
+            const ui = new shaka.ui.Overlay(player, container, video);
+            const controls = ui.getControls();
 
-.block-sub{ 
-font-size:14px; 
-font-weight:500; 
-color:rgba(255, 255, 255, 0.6); 
-line-height:1.6; 
-} 
+            // Configure DRM (ClearKey)
+            player.configure({
+                drm: {
+                    clearKeys: {
+                        [KEY_ID]: CLEAR_KEY
+                    }
+                },
+                streaming: {
+                    lowLatencyMode: true,
+                    bufferingGoal: 15
+                }
+            });
 
-@media(max-width:700px){ 
-.block-title{font-size:24px} 
-.block-box{padding:25px} 
-} 
-</style> 
-</head> 
-<body> 
+            // Handle errors
+            player.addEventListener('error', (event) => {
+                console.error('Error code', event.detail.code, 'object', event.detail);
+            });
 
-<div class="shaka-video-container" id="player-container"> 
-<video id="video" autoplay muted playsinline preload="metadata"></video> 
-</div> 
+            try {
+                await player.load(MANIFEST_URL);
+                console.log('The video has now been loaded!');
+            } catch (e) {
+                console.error('Error loading manifest', e);
+            }
+        }
 
-<script> 
-(function(){ 
-// --- 1. PLAYER LOGIC ---
-function isSandboxedEnv(){ 
-try { 
-if (window.self === window.top) return false; 
-if (window.frameElement && window.frameElement.hasAttribute("sandbox")) return true; 
-return false; 
-} catch(e) { return true; } 
-} 
-
-function triggerBlockScreen(title, message){ 
-const container = document.getElementById("player-container"); 
-const video = document.getElementById("video"); 
-try { video.pause(); video.removeAttribute('src'); video.load(); } catch(e){} 
-
-const overlay = document.createElement("div"); 
-overlay.className = "block-overlay"; 
-overlay.innerHTML = `<div class="block-box"><div class="block-title">${title}</div><div class="block-sub">${message}</div></div>`; 
-document.body.appendChild(overlay); 
-container.style.display = 'none'; 
-} 
-
-if(isSandboxedEnv()){ 
-triggerBlockScreen('Disable Sandbox', 'Please open this link directly in a browser (Chrome/Edge) for the best experience.'); 
-return; 
-} 
-
-// UPDATED CONFIG WITH YOUR NEW STREAM
-const CONFIG={ 
-streamUrl:"https://ev-fast-mpd.starzplayarabia.com/live/eds/CricLife1/DASH/CricLife1.mpd", 
-keyId:"1e23e51b09a67b83813c17049870bcd4", 
-key:"c3d6288e378b0dc55320fd0e6fd2e55f"
-}; 
-
-document.addEventListener("DOMContentLoaded",async()=>{ 
-shaka.polyfill.installAll(); 
-if(!shaka.Player.isBrowserSupported()) return; 
-
-const video=document.getElementById("video"); 
-const container=document.getElementById("player-container"); 
-
-const player=new shaka.Player(); 
-await player.attach(video); 
-
-const ui=new shaka.ui.Overlay(player,container,video); 
-ui.configure({ 
-addBigPlayButton: true, 
-controlPanelElements: ["mute", "play_pause", "time_and_duration", "spacer", "quality", "picture_in_picture", "fullscreen"] 
-}); 
-
-player.configure({ 
-drm:{ 
-    clearKeys:{ 
-        [CONFIG.keyId]: CONFIG.key 
-    } 
-}, 
-manifest:{defaultPresentationDelay:5}, 
-streaming:{ lowLatencyMode:true, bufferingGoal:15, rebufferingGoal:2, safeSeekOffset:5 } 
-}); 
-
-// Network filters removed headers that were specific to Jio, making it cleaner for StarzPlay
-player.getNetworkingEngine().registerRequestFilter((type,request)=>{ 
-    // Basic headers for compatibility
-    request.headers["Origin"] = "https://starzplay.com"; 
-}); 
-
-try{ 
-await player.load(CONFIG.streamUrl); 
-video.play().catch(()=>{}); 
-}catch(e){
-    console.error("Error loading stream", e);
-} 
-
-video.addEventListener("play",()=>{ video.muted=false; }); 
-}); 
-})(); 
-</script> 
-</body> 
+        document.addEventListener('shaka-ui-loaded', initPlayer);
+        // Fallback for non-UI initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window['shaka-ui-loaded-event-fired']) initPlayer();
+        });
+    </script>
+</body>
 </html>
