@@ -2,92 +2,74 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Clean Dash Player</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Clean Stream Player</title>
+    <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css"/>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #000;
-            overflow: hidden;
-            font-family: sans-serif;
-        }
-        #video-container {
-            width: 100%;
-            height: 100%;
-        }
-        video {
-            width: 100%;
-            height: 100%;
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
+        #player-container { width: 100%; height: 100%; }
+        video { width: 100%; height: 100%; }
     </style>
 </head>
 <body>
 
-    <div id="video-container" data-shaka-player-container>
-        <video id="video" data-shaka-player autoplay playsinline></video>
-    </div>
+<div data-shaka-player-container id="player-container">
+    <video data-shaka-player id="video" autoplay playsinline></video>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.min.js"></script>
+<script>
+const manifestUri = 'https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/nk2wxfedpq/out/v1/b7421a8cb3db4905b5b4abfc0e4d66c0/cenc.mpd';
+const keyId = '58ca11783371eb92b94f380587be997c';
+const key = '2bf17be97a1846b73b36f4aa33f6c6a8';
 
-    <script>
-        // Configuration Constants
-        const MANIFEST_URL = "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/nk2wxfedpq/out/v1/b7421a8cb3db4905b5b4abfc0e4d66c0/cenc.mpd";
-        const KEY_ID = "58ca11783371eb92b94f380587be997c";
-        const CLEAR_KEY = "2bf17be97a1846b73b36f4aa33f6c6a8";
+async function initPlayer() {
+    // Install built-in polyfills to patch browser incompatibilities.
+    shaka.polyfill.installAll();
 
-        async function initPlayer() {
-            // Install built-in polyfills to patch browser incompatibilities
-            shaka.polyfill.installAll();
+    // Check to see if the browser supports the basic APIs Shaka needs.
+    if (!shaka.Player.isBrowserSupported()) {
+        console.error('Browser not supported!');
+        return;
+    }
 
-            // Check to see if the browser supports the basic APIs
-            if (!shaka.Player.isBrowserSupported()) {
-                console.error('Browser not supported!');
-                return;
+    const video = document.getElementById('video');
+    const container = document.getElementById('player-container');
+    const player = new shaka.Player(video);
+
+    // Setting up the UI
+    const ui = new shaka.ui.Overlay(player, container, video);
+    ui.configure({
+        'controlPanelElements': ['play_pause', 'time_and_duration', 'spacer', 'mute', 'volume', 'quality', 'fullscreen'],
+        'addBigPlayButton': true
+    });
+
+    // Configure DRM ClearKeys
+    player.configure({
+        drm: {
+            clearKeys: {
+                [keyId]: key
             }
-
-            const video = document.getElementById('video');
-            const container = document.getElementById('video-container');
-            const player = new shaka.Player(video);
-
-            // Setting up the UI
-            const ui = new shaka.ui.Overlay(player, container, video);
-            const controls = ui.getControls();
-
-            // Configure DRM (ClearKey)
-            player.configure({
-                drm: {
-                    clearKeys: {
-                        [KEY_ID]: CLEAR_KEY
-                    }
-                },
-                streaming: {
-                    lowLatencyMode: true,
-                    bufferingGoal: 15
-                }
-            });
-
-            // Handle errors
-            player.addEventListener('error', (event) => {
-                console.error('Error code', event.detail.code, 'object', event.detail);
-            });
-
-            try {
-                await player.load(MANIFEST_URL);
-                console.log('The video has now been loaded!');
-            } catch (e) {
-                console.error('Error loading manifest', e);
-            }
+        },
+        streaming: {
+            lowLatencyMode: true,
+            bufferingGoal: 15
         }
+    });
 
-        document.addEventListener('shaka-ui-loaded', initPlayer);
-        // Fallback for non-UI initialization
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!window['shaka-ui-loaded-event-fired']) initPlayer();
-        });
-    </script>
+    // Error handling
+    player.addEventListener('error', (event) => console.error('Error code', event.detail.code, 'object', event.detail));
+
+    // Load the stream
+    try {
+        await player.load(manifestUri);
+        console.log('The video has now been loaded!');
+    } catch (e) {
+        console.error('Unable to load!', e);
+    }
+}
+
+document.addEventListener('shaka-ui-loaded', initPlayer);
+</script>
 </body>
 </html>
