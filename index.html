@@ -3,7 +3,7 @@
 <head> 
 <meta charset="utf-8"> 
 <meta name="viewport" content="width=device-width,initial-scale=1"> 
-<title>Live Stream - Custom Player</title> 
+<title>Live Stream Player</title> 
 <meta name="referrer" content="no-referrer"> 
 <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.min.js"></script> 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css"/> 
@@ -131,11 +131,11 @@ triggerBlockScreen('Disable Sandbox', 'Opening Chrome Browser Only');
 return; 
 } 
 
-// UPDATED CONFIG WITH YOUR NEW STREAM AND KEYS
+// NEW STREAM CONFIG (Updated with your data)
 const CONFIG={ 
-streamUrl: "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/nk2wxfedpq/out/v1/b7421a8cb3db4905b5b4abfc0e4d66c0/cenc.mpd", 
-keyId: "58ca11783371eb92b94f380587be997c", 
-key: "2bf17be97a1846b73b36f4aa33f6c6a8"
+streamUrl:"https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/azwuqtlxfr/out/v1/78eb78ea2c374576ba1ff8a6df562586/cenc.mpd", 
+keyId:"50195344b760466888f9086d43b639b4", 
+key:"97497ea2d101d957f291271247c53cdf"
 }; 
 
 document.addEventListener("DOMContentLoaded",async()=>{ 
@@ -161,17 +161,17 @@ manifest:{defaultPresentationDelay:5},
 streaming:{ lowLatencyMode:true, bufferingGoal:10, rebufferingGoal:2, safeSeekOffset:5 } 
 }); 
 
-// Custom Filters (Maintaining Headers logic but without Jiotv cookie unless needed)
+// Request filters maintained for security/compatibility
 player.getNetworkingEngine().registerRequestFilter((type,request)=>{ 
-// Keeping general headers for stability
-request.headers["User-Agent"]="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"; 
+// Note: Amazon/AIV CDN usually requires specific headers if not public
+request.headers["Referer"]="https://www.primevideo.com/"; 
 }); 
 
 try{ 
 await player.load(CONFIG.streamUrl); 
 video.play().catch(()=>{}); 
 }catch(e){
-    console.error("Error loading stream:", e);
+    console.error("Error loading stream", e);
 } 
 
 video.addEventListener("play",()=>{ video.muted=false; }); 
