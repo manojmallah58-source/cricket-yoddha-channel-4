@@ -3,7 +3,7 @@
 <head> 
 <meta charset="utf-8"> 
 <meta name="viewport" content="width=device-width,initial-scale=1"> 
-<title>Live Stream Player</title> 
+<title>Live Stream - Updated</title> 
 <meta name="referrer" content="no-referrer"> 
 <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.min.js"></script> 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css"/> 
@@ -26,18 +26,6 @@ width:100%;
 height:100%; 
 object-fit:contain; 
 background:#000; 
-} 
-
-.custom-watermark{ 
-position:absolute; 
-z-index:40; 
-pointer-events:none; 
-top:65%; 
-left:6%; 
-transform:translateY(-50%); 
-font-size:11px; 
-font-weight:600; 
-color:rgba(255,255,255,0.12); 
 } 
 
 .block-overlay{ 
@@ -84,7 +72,6 @@ line-height:1.6;
 } 
 
 @media(max-width:700px){ 
-.custom-watermark{font-size:9px;top:60%;left:16%} 
 .block-title{font-size:28px} 
 .block-box{padding:25px} 
 } 
@@ -94,22 +81,16 @@ line-height:1.6;
 
 <div class="shaka-video-container" id="player-container"> 
 <video id="video" autoplay muted playsinline preload="metadata"></video> 
-<div class="custom-watermark"> </div> 
 </div> 
 
 <script> 
 (function(){ 
-// --- 1. ADS REMOVED ---
 
-// --- 2. PLAYER LOGIC ---
+// --- 1. SANDBOX CHECK ---
 function isSandboxedEnv(){ 
 try { 
 if (window.self === window.top) return false; 
 if (window.frameElement && window.frameElement.hasAttribute("sandbox")) return true; 
-try { 
-document.domain = document.domain; 
-if (window.frameElement && !window.frameElement.getAttribute("sandbox")) return false; 
-} catch (e) { return true; } 
 return false; 
 } catch(e) { return true; } 
 } 
@@ -127,13 +108,13 @@ container.style.display = 'none';
 } 
 
 if(isSandboxedEnv()){ 
-triggerBlockScreen('Disable Sandbox', 'Opening Chrome Browser Only'); 
+triggerBlockScreen('Disable Sandbox', 'Please open this link directly in Chrome Browser.'); 
 return; 
 } 
 
-// NEW STREAM CONFIG (Updated with your data)
+// --- 2. UPDATED CONFIG WITH NEW URL & KEYS ---
 const CONFIG={ 
-streamUrl:"https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/azwuqtlxfr/out/v1/78eb78ea2c374576ba1ff8a6df562586/cenc.mpd", 
+streamUrl:"https://a96aivottlinear-a.akamaihd.net/OTTB/iad-nitro/enc/azwuqtlxfr/out/v1/78eb78ea2c374576ba1ff8a6df562586/cenc.mpd", 
 keyId:"50195344b760466888f9086d43b639b4", 
 key:"97497ea2d101d957f291271247c53cdf"
 }; 
@@ -144,7 +125,6 @@ if(!shaka.Player.isBrowserSupported()) return;
 
 const video=document.getElementById("video"); 
 const container=document.getElementById("player-container"); 
-video.muted=true; 
 
 const player=new shaka.Player(); 
 await player.attach(video); 
@@ -161,17 +141,17 @@ manifest:{defaultPresentationDelay:5},
 streaming:{ lowLatencyMode:true, bufferingGoal:10, rebufferingGoal:2, safeSeekOffset:5 } 
 }); 
 
-// Request filters maintained for security/compatibility
+// Headers for Akamai/Jio stability
 player.getNetworkingEngine().registerRequestFilter((type,request)=>{ 
-// Note: Amazon/AIV CDN usually requires specific headers if not public
-request.headers["Referer"]="https://www.primevideo.com/"; 
+request.headers["Referer"]="https://www.jiotv.com/"; 
+request.headers["User-Agent"]="plaYtv/7.1.5 (Linux;Android 13) ExoPlayerLib/2.11.6"; 
 }); 
 
 try{ 
 await player.load(CONFIG.streamUrl); 
 video.play().catch(()=>{}); 
 }catch(e){
-    console.error("Error loading stream", e);
+    console.error("Load failed", e);
 } 
 
 video.addEventListener("play",()=>{ video.muted=false; }); 
