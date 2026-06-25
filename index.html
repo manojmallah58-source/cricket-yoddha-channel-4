@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Star Sports 2 Hindi HD</title>
+    <title>Star Sports 1 Hindi HD</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">
     <style>
@@ -68,15 +68,16 @@
             });
 
             // UPDATED: New Stream URL and DRM Configuration
-            let streamUrl = "https://jiotvpllive.cdn.jio.com/bpk-tv/StarSportsHD2Hin_BTS/WDVLive/index.mpd";
+            let streamUrl = "https://jiotvpllive.cdn.jio.com/bpk-tv/Star_Sports_HD1_Hindi_BTS/WDVLive/index.mpd?__hdnea__=st=1782383338~exp=1782404938~acl=/bpk-tv/Star_Sports_HD1_Hindi_BTS/WDVLive/*~hmac=a2240e133ec08d5f192564712da7f2d6bee93772464960e63e9fd0094e6e1db3";
+            
             let drmConfig = {
                 clearKeys: {
-                    "bd1ea6a1c1fb5dcdb709434e0826bbc0": "f57f22cba32739ce7beb1fab3f3d060b"
+                    "400131994b445d8c8817202248760fda": "2d56cb6f07a75b9aff165d534ae2bfc4",
+                    "08638117638b55649c6befa7f5cb34f6": "58ddb6bbdf8d8b1e2aac2b5312e99086"
                 }
             };
             
-            // Updated Cookie header based on the new URL provided
-            let cookieHeader = "__hdnea__=st=1781695826~exp=1781717426~acl=/bpk-tv/StarSportsHD2Hin_BTS/WDVLive/*~hmac=8da13968b5f25896d4f6675eb3d41b9b41cbc3d0196e8ea7c498efe27d79af07";
+            let cookieHeader = "__hdnea__=st=1782383338~exp=1782404938~acl=/bpk-tv/Star_Sports_HD1_Hindi_BTS/WDVLive/*~hmac=a2240e133ec08d5f192564712da7f2d6bee93772464960e63e9fd0094e6e1db3";
 
             player.configure({
                 drm: drmConfig,
