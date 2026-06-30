@@ -67,8 +67,8 @@
                 seekBarColors: { base: 'white', buffered: 'red', played: 'blue' }
             });
 
-            // UPDATED: Stream URL and DRM Configuration
-            let streamUrl = "https://jiotvpllive.cdn.jio.com/bpk-tv/Star_Sports_HD1_Hindi_BTS/WDVLive/index.mpd?__hdnea__=st=1782652579~exp=1782674179~acl=/bpk-tv/Star_Sports_HD1_Hindi_BTS/WDVLive/*~hmac=016bc10ce4ba1f9ad5f1481ddf88b40c9fa23edbb4881598c665f7bfc382e94b";
+            // UPDATED: New Stream URL and DRM Configuration
+            let streamUrl = "https://jiotvpllive.cdn.jio.com/bpk-tv/Star_Sports_HD1_Hindi_BTS/WDVLive/index.mpd?__hdnea__=st=1782819810~exp=1782841410~acl=/bpk-tv/Star_Sports_HD1_Hindi_BTS/WDVLive/*~hmac=53c71a80c0ba05c7e4a70abd3848bf4316b1d04dcdcc89ee720db853c2519a99";
             
             let drmConfig = {
                 clearKeys: {
@@ -76,7 +76,8 @@
                 }
             };
             
-            let cookieHeader = "__hdnea__=st=1782652579~exp=1782674179~acl=/bpk-tv/Star_Sports_HD1_Hindi_BTS/WDVLive/*~hmac=016bc10ce4ba1f9ad5f1481ddf88b40c9fa23edbb4881598c665f7bfc382e94b";
+            // Cookie extracted from URL
+            let cookieHeader = "__hdnea__=st=1782819810~exp=1782841410~acl=/bpk-tv/Star_Sports_HD1_Hindi_BTS/WDVLive/*~hmac=53c71a80c0ba05c7e4a70abd3848bf4316b1d04dcdcc89ee720db853c2519a99";
 
             player.configure({
                 drm: drmConfig,
@@ -96,7 +97,7 @@
 
             player.getNetworkingEngine().registerRequestFilter((type, request) => {
                 request.headers['Referer'] = 'https://www.jiotv.com/';
-                request.headers['User-Agent'] = "plaYtv/7.1.5 (Linux;Android 13) ExoPlayerLib/2.11.6";
+                request.headers['User-Agent'] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
                 request.headers['Cookie'] = cookieHeader;
 
                 if ((type === shaka.net.NetworkingEngine.RequestType.MANIFEST || 
@@ -130,6 +131,7 @@
                 console.error('Load error:', error);
             }
 
+            // Unmute on first interaction
             ['click', 'touchstart'].forEach(event => {
                 document.addEventListener(event, () => { if(video.muted) video.muted = false; }, { once: true });
             });
