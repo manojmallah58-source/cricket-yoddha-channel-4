@@ -68,7 +68,7 @@
             });
 
             // UPDATED: New Stream URL and DRM Configuration
-            let streamUrl = "https://jiotvpllive.cdn.jio.com/bpk-tv/Star_Sports_HD1_Hindi_BTS/WDVLive/index.mpd?__hdnea__=st=1782819810~exp=1782841410~acl=/bpk-tv/Star_Sports_HD1_Hindi_BTS/WDVLive/*~hmac=53c71a80c0ba05c7e4a70abd3848bf4316b1d04dcdcc89ee720db853c2519a99";
+            let streamUrl = "https://jiotvpllive.cdn.jio.com/bpk-tv/Star_Sports_HD1_Hindi_BTS/WDVLive/index.mpd?__hdnea__=st=1783246149~exp=1783267749~acl=/bpk-tv/Star_Sports_HD1_Hindi_BTS/WDVLive/*~hmac=8eb0023bc1fca5424b688cb5eff3939ee468978d94a795af56b9506f6570d6c6";
             
             let drmConfig = {
                 clearKeys: {
@@ -76,8 +76,7 @@
                 }
             };
             
-            // Cookie extracted from URL
-            let cookieHeader = "__hdnea__=st=1782819810~exp=1782841410~acl=/bpk-tv/Star_Sports_HD1_Hindi_BTS/WDVLive/*~hmac=53c71a80c0ba05c7e4a70abd3848bf4316b1d04dcdcc89ee720db853c2519a99";
+            let cookieHeader = "__hdnea__=st=1783246149~exp=1783267749~acl=/bpk-tv/Star_Sports_HD1_Hindi_BTS/WDVLive/*~hmac=8eb0023bc1fca5424b688cb5eff3939ee468978d94a795af56b9506f6570d6c6";
 
             player.configure({
                 drm: drmConfig,
@@ -131,7 +130,6 @@
                 console.error('Load error:', error);
             }
 
-            // Unmute on first interaction
             ['click', 'touchstart'].forEach(event => {
                 document.addEventListener(event, () => { if(video.muted) video.muted = false; }, { once: true });
             });
