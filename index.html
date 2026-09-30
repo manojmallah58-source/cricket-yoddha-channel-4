@@ -48,13 +48,13 @@
 </head>
 <body>
   <div class="video-container">
-    <video autoplay playsinline muted id="player" controls preload="metadata"></video>
+    <video autoplay playsinline muted id="player" controls preload="auto"></video>
   </div>
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const video = document.getElementById("player");
-      const source = "https://live.talkoraai.com/match/seg?t=gMIHZIFjGnIea3snS-GDymOlbVNiq6LxdzbmMVe4wIXz13oSN8g-qKG9VLNohK-Vfb_DZm5rr-7mDxF5o2CBvdSFZxs7rp7kRvZQ5o8ytipdWs-Wpb2pHx38wi7M9vPQU0zOUEZ9zye3c3H2ZH8_kk7dn4cF8cp9E2jNWNn3tVuSGybnxNRiTL-4zSWd7wGRcXBRZJeefQbS0pCBCVZshzSKRZMQboY3pIcsndhi2T3zCJY0wB0kEbFMcnl2HBY7O6ZocczDf06Qt7omdS1IcXDfIx9c71Hee1SE-p3iwQ";
+      const source = "https://live.talkoraai.com/match/hls?t=pWP6f3rja0RaCSpmr-Dyag6J8-S3Oe0GwpBv-KUKV3VFryh5o_XlfaEWVhkXJ8_aUnGxMgrXxffkNR_vKCtmcH1PL_RSLIs43_cYOTjE8vKnaWbRyI9exeo6e6wBpJxYDjIuBRAyawyRTsuvSMuQCtlZzOJRCde6qC9IXRwS5Lj8bfaeufKqqeOVrm5jmsNZLurfoC9SZb8pofuQFgL5UEi6EhG_ISMTChH1i0u4KIgAyvaHJe0zS5J0S_fFhwfXFL5dH3tVEipE1X0c7MiQR1LPX2dpAi4";
 
       const defaultOptions = {
         autoplay: true,
@@ -105,7 +105,11 @@
 
       if (Hls.isSupported()) {
         const hls = new Hls({
-          autoStartLoad: true
+          autoStartLoad: true,
+          liveSyncDurationCount: 3,
+          liveMaxLatencyDurationCount: 10,
+          highBufferWatchdogPeriod: 1,
+          nudgeMaxRetry: 5
         });
 
         hls.loadSource(source);
@@ -120,7 +124,17 @@
         // 🔥 AUTO RECOVER ON ERROR
         hls.on(Hls.Events.ERROR, function (_, data) {
           if (data.fatal) {
-            hls.startLoad();
+            switch (data.type) {
+              case Hls.ErrorTypes.NETWORK_ERROR:
+                hls.startLoad();
+                break;
+              case Hls.ErrorTypes.MEDIA_ERROR:
+                hls.recoverMediaError();
+                break;
+              default:
+                hls.destroy();
+                break;
+            }
           }
         });
 
