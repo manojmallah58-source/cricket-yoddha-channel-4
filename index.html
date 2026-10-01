@@ -54,7 +54,7 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const video = document.getElementById("player");
-      const source = "https://live.talkoraai.com/match/hls?t=https://sportlink-cric.pages.dev/api/proxy?u=https%3A%2F%2Fdishmt.slivcdn.com%2Fhls%2Flive%2F2020591%2FTEN3HD%2Fhdntl%3Dexp%3D1790910954~acl%3D%252f*~id%3Dfaac6a51-8551-45cd-93a5-ab77e17c2de4~data%3Dhdntl~hmac%3D42ffed9d87dcc8e9f9720b799383e6f2f1ff74bb9c2f4f117b61343c15410a0d%2Fmaster_3500.m3u8%3Faka_me_session_id%3DAAAAAAAAAADqIb9qAAAAAO%2B3m8%2BqEH4hKVR7Z21mGtodTXFb6oObdW51hmnsgH93zRtqZ5wwVNmohCkjQn%252f9Yv7W1Kh%252fTqio%26aka_media_format_type%3Dhls";
+      const source = "https://sunny-relay-friend.lovable.app/api/public/px/sony?url=https://dishmt.slivcdn.com/hls/live/2011747/TEN1HD/master.m3u8?hdnea=exp=1790839308~acl=/*~id=08016560153914143644868622104267~hmac=b7982f55e0f742e7dd0a58e8c83cc9c1ed978c2500dd5128e570b1423598195d";
 
       const defaultOptions = {
         autoplay: true,
@@ -106,10 +106,9 @@
       if (Hls.isSupported()) {
         const hls = new Hls({
           autoStartLoad: true,
-          liveSyncDurationCount: 3,
-          liveMaxLatencyDurationCount: 10,
-          highBufferWatchdogPeriod: 1,
-          nudgeMaxRetry: 5
+          lowLatencyMode: true,
+          fragLoadingTimeOut: 20000,
+          manifestLoadingTimeOut: 20000
         });
 
         hls.loadSource(source);
